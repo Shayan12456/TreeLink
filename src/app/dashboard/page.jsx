@@ -6,21 +6,10 @@ import AddRowModal from '../components/AddRowModal';
 import EditRowModal from '../components/EditRowModal';
 import supabase from '../utils/supabaseClient';
 
-function DashboardPage() {
+async function DashboardPage() {
 
-  async function getData() {
-    const { data, error } = await supabase
-    .from('users') // Name of your table in Supabase
-    .select('*'); // Fetches all columns 
+  const { data, error } = await supabase.from('your_table_name').select('*');
 
-    return data;
-  }
-
-let data;
-// Using .then() to handle the resolved data from getData
-getData().then(response => {
-  data = response; // 'response' will be the data returned from the getData function
-});
 
 
   const [rows, setRows] = useState([
