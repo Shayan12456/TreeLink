@@ -1,44 +1,119 @@
-"use client"
+"use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Trees, LogOut, Plus, Edit2, Trash2 } from 'lucide-react';
 import AddRowModal from '../components/AddRowModal';
 import EditRowModal from '../components/EditRowModal';
 import supabase from '../utils/supabaseClient';
+import Loader from '../components/Loader';  // Your Loader component
 
-async function DashboardPage() {
-
-  const { data, error } = await supabase.from('your_table_name').select('*');
-
-
-
-  const [rows, setRows] = useState([
-    { id: 1, name: 'Alice Johnson' },
-    { id: 2, name: 'Bob Smith' },
-    { id: 3, name: 'Charlie Brown' }
-  ]);
+function DashboardPage() {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingRow, setEditingRow] = useState(null);
+  const [editId, setEditId] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [deleteRow, setDeleteRow] = useState(0);
 
-  const handleAdd = (newName) => {
-    setRows([...rows, { id: Date.now(), name: newName }]);
+  const handleAdd = async (newName) => {
     setIsAddModalOpen(false);
-  };
 
-  const handleEdit = (id, newName) => {
-    setRows(rows.map(row => row.id === id ? { ...row, name: newName } : row));
-    setIsEditModalOpen(false);
+    insertData({ user_id: data[0].user_id, directory_name: newName});
+    setTimeout(fetchData, 1000);
   };
 
   const handleDelete = (id) => {
-    setRows(rows.filter(row => row.id !== id));
+    deleteData(id);
+
+    setTimeout(fetchData, 1000);
+
   };
 
-  const openEditModal = (row) => {
-    setEditingRow(row);
-    setIsEditModalOpen(true);
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from('users') // Change to your table 
+      .select('user_id, username, email, created_at, directories(directory_id, directory_name, task_id, created_at)') // Select fields from both tables
+      .order('created_at', { foreignTable: 'directories' });
+    if (error) {
+      setError(error);
+      setLoading(false);
+    } else {
+      setData(data);
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+      // Fetch data from Supabase
+      fetchData();
+  }, []); 
+
+  
+    const insertData = async (row) => {
+      try{
+        const { data, error } = await supabase
+        .from('directories') // Name of the table
+        .insert(row)//pushed to DB
+
+        if (error) {
+          console.error('Error deleting data:', error);
+        } else {
+          console.log('Data deleted:', data);
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+      }
+    };
+
+
+    // delete data from Supabase
+    const deleteData = async (id) => {
+      try {
+        const { data, error } = await supabase
+          .from('directories') // Name of the table
+          .delete()
+          .match({ directory_id: id }); // Replace 'id' with the column name used for row identification
+  
+        if (error) {
+          console.error('Error deleting data:', error);
+        } else {
+          console.log('Data deleted:', data);
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+      }
+    }
+
+     
+    // edit data in Supabase
+    const editData = async (id, newName) => {
+      try {
+        const { data, error } = await supabase
+          .from('directories') // Name of the table
+          .update({ directory_name: newName })
+          .match({ directory_id: id }); // Replace 'id' with the column name used for row identification
+  
+        if (error) {
+          console.error('Error editing data:', error);
+        } else {
+          console.log('Data edited:', data);
+          setTimeout(fetchData, 1000);
+          setIsEditModalOpen(false);
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+      }
+    }
+
+    const handleEdit = (id) => {
+      setEditId(id);
+      setIsEditModalOpen(true);
+    };
+
+  if (loading) {
+    return <Loader />;  // Show the loader until data is fetched
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,8 +138,8 @@ async function DashboardPage() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* User Info */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">kk</h2>
-            <p className="text-gray-600">@johndoe</p>
+            <h2 className="text-2xl font-bold text-gray-900">{data[0].username}</h2>
+            <p className="text-gray-600">@{data[0].username}</p>
           </div>
 
           {/* Table Header */}
@@ -81,44 +156,49 @@ async function DashboardPage() {
 
           {/* Table */}
           <div className="space-y-3">
-            {rows.map((row) => (
+            {data[0].directories.map((row) => (
               <div
-                key={row.id}
+                key={row.directory_id}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <span className="font-medium text-gray-900">{row.name}</span>
+                <span className="font-medium text-gray-900">{row.directory_name}</span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => openEditModal(row)}
+                    onClick={()=>{handleEdit(row.directory_id)}}
+                    // onClick={() => setIsEditModalOpen(true)}
                     className="text-gray-600 hover:text-emerald-600 transition-colors"
                   >
                     <Edit2 className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(row.id)}
+                    onClick={() => handleDelete(row.directory_id)}
                     className="text-gray-600 hover:text-red-600 transition-colors"
                   >
+                    
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               </div>
+              
             ))}
           </div>
         </div>
       </main>
 
       {/* Modals */}
+      <EditRowModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        id={editId}
+        onEdit={editData}
+      />
+
       <AddRowModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAdd}
       />
-      <EditRowModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        row={editingRow}
-        onEdit={handleEdit}
-      />
+      
     </div>
   );
 }

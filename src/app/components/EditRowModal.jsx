@@ -1,18 +1,13 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-function EditRowModal({ isOpen, onClose, row, onEdit }) {
+function EditRowModal({ isOpen, onClose, id, onEdit }) {
   const [name, setName] = useState('');
-
-  useEffect(() => {
-    if (row) {
-      setName(row.name);
-    }
-  }, [row]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onEdit(row.id, name);
+    console.log(id)
+    onEdit(id, name);
   };
 
   if (!isOpen) return null;
