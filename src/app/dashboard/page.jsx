@@ -6,15 +6,16 @@ import AddRowModal from '../components/AddRowModal';
 import EditRowModal from '../components/EditRowModal';
 import supabase from '../utils/supabaseClient';
 import Loader from '../components/Loader';  // Your Loader component
+import { useRouter } from 'next/navigation';
 
 function DashboardPage() {
   const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editId, setEditId] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [deleteRow, setDeleteRow] = useState(0);
+
+  const router = useRouter();
 
   const handleAdd = async (newName) => {
     setIsAddModalOpen(false);
@@ -23,11 +24,18 @@ function DashboardPage() {
     setTimeout(fetchData, 1000);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
     deleteData(id);
 
     setTimeout(fetchData, 1000);
 
+  };
+
+  const handleEdit = (id, e) => {
+    e.stopPropagation();
+    setEditId(id);
+    setIsEditModalOpen(true);
   };
 
   const fetchData = async () => {
@@ -57,9 +65,9 @@ function DashboardPage() {
         .insert(row)//pushed to DB
 
         if (error) {
-          console.error('Error deleting data:', error);
+          console.error('Error adding data:', error);
         } else {
-          console.log('Data deleted:', data);
+          console.log('Data added:', data);
         }
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -105,11 +113,6 @@ function DashboardPage() {
         console.error('Unexpected error:', err);
       }
     }
-
-    const handleEdit = (id) => {
-      setEditId(id);
-      setIsEditModalOpen(true);
-    };
 
   if (loading) {
     return <Loader />;  // Show the loader until data is fetched
@@ -159,19 +162,20 @@ function DashboardPage() {
             {data[0].directories.map((row) => (
               <div
                 key={row.directory_id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={()=>router.push(`taskboard/${data[0].username}/${row.directory_id}`)}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <span className="font-medium text-gray-900">{row.directory_name}</span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={()=>{handleEdit(row.directory_id)}}
+                    onClick={(e)=>{handleEdit(row.directory_id, e)}}
                     // onClick={() => setIsEditModalOpen(true)}
                     className="text-gray-600 hover:text-emerald-600 transition-colors"
                   >
                     <Edit2 className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(row.directory_id)}
+                    onClick={(e) => handleDelete(row.directory_id, e)}
                     className="text-gray-600 hover:text-red-600 transition-colors"
                   >
                     
