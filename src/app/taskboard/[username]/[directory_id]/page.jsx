@@ -3,21 +3,20 @@
 import React, { useEffect, useState } from 'react'
 import supabase from '../../../utils/supabaseClient';
 import Loader from '../../../components/Loader';  // Your Loader component
-// import { useParams } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 const page = () => {
-  // const { directory_id } = useParams();  // Access the dynamic parameter
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]);  // array of objects
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     const { data, error } = await supabase
       .from('taskboard') // Change to your table 
-      .select("*") // Select fields from both tables
+      .select("*");
 
-      console.log('Fetched data:', data);
-      setData(data)
-      setLoading(false);
+    setData(data);
+    setLoading(false);
   }
 
   useEffect(fetchData, [])
@@ -26,71 +25,75 @@ const page = () => {
     return <Loader />;  // Show the loader until data is fetched
   }
 
-  // Group tasks by parent_id
+// Group tasks by parent_id and organize them into left and right children
   const groupedTasks = data.reduce((acc, task) => {
     if (task.parent_id !== "NULL") {
       if (!acc[task.parent_id]) {
-        acc[task.parent_id] = [];
+        acc[task.parent_id] = { left: null, right: null };
       }
-      acc[task.parent_id].push(task);
+      if (task.node_direction === "left") {
+        acc[task.parent_id].left = task;
+      } else if (task.node_direction === "right") {
+        acc[task.parent_id].right = task;
+      }
     }
     return acc;
   }, {});
 
-  return (
-    <div className='w-screen h-screen bg-black' style={{display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center", overflow: "scroll"}}>
-      <div className="nodeandbuttons" style={{display: "flex"}}>
-        <div className="node" style={{backgroundColor: "#0e3f60", display: "flex", justifyContent:"center", alignItems:"center", color:"white", width: "5vw", height:"5vw", borderRadius:"50%" ,padding: "10vh", border: "1px solid #308e40", marginRight: "1vw"}}>
-          {data.filter((node)=>node.parent_id == "NULL")[0].node_name}
-        </div>
+  // Function to render a node and its left and right children recursively
 
-        <div className="node-buttons" style={{display: "flex", flexDirection: "column"}}>
-          <button style={{backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px"}}>ADD</button>
-          <br />
-          <button style={{backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px"}}>EDIT</button>
-        </div>
+  const renderNode = (task, index) => {
+    // Get the current node's children based on the groupedTasks object
+    const children = groupedTasks[task.node_id] || { left: null, right: null };
+  
+    return (
+      <div className="flex flex-col items-center" key={index}>
+  {/* Current Node */}
+  <div className='flex items-center justify-center'>
+    <div className='flex flex-col justify-center items-center'>
+      
+
+      <div
+        className="node bg-[#0e3f60] flex justify-center items-center text-white w-[5vw] h-[5vw] mr-[1vw] p-[10vh]"
+        style={{
+          borderRadius: "50%",
+          border: "1px solid #308e40",
+        }}
+      >
+        {task.node_name}
       </div>
-      {/* {
-        data.filter((node)=>node.parent_id != "NULL").forEach(task => {
-          return (
-            <>
-              <div className="node" style={{backgroundColor: "#0e3f60", display: "flex", justifyContent:"center", alignItems:"center", color:"white", width: "5vw", height:"5vw", borderRadius:"50%" ,padding: "10vh", border: "1px solid #308e40", marginRight: "1vw"}}>
-                {task.node_name}
-              </div>
-              <div className="node-buttons" style={{display: "flex", flexDirection: "column"}}>
-                <button style={{backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px"}}>ADD</button>
-                <br />
-                <button style={{backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px"}}>EDIT</button>
-              </div>
-            </>
-          );
-        })
-      } */}
-{/* Render tasks grouped by parent_id */}
-{Object.keys(groupedTasks).map((parentId) => (
-        <div key={parentId} style={{ display: "flex", marginBottom: "2vh" }}>
-          {groupedTasks[parentId].map((task, index) => (
-            <div key={index} style={{ display: "flex", alignItems: "center", marginBottom: "1vh" }}>
-              <div className="node" style={{
-                backgroundColor: "#0e3f60", display: "flex", justifyContent: "center", alignItems: "center", color: "white", width: "5vw", height: "5vw", borderRadius: "50%",
-                padding: "10vh", border: "1px solid #308e40", marginRight: "1vw"
-              }}>
-                {task.node_name}
-              </div>
-              <div className="node-buttons" style={{ display: "flex", flexDirection: "column" }}>
-                <button style={{
-                  backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px", marginBottom: "1vh"
-                }}>ADD</button>
-                <button style={{
-                  backgroundColor: "#5b3164", border: "1px solid white", color: "white", padding: "1vh 3vw", borderRadius: "10px"
-                }}>EDIT</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}
+      {/* Arrow Indicator */}
+      <div className="text-[green]">
+        <FontAwesomeIcon icon={faArrowDown} className='h-[10px] rotate-[45deg]' />
+      </div>
     </div>
-  )
-}
+  </div>
 
-export default page
+  {/* Left and Right Children */}
+  <div className="flex mx-auto w-full justify-between">
+    {/* Render Left Child */}
+    {children.left && renderNode(children.left, `${index}-left`)}
+    {/* Render Right Child */}
+    {children.right && renderNode(children.right, `${index}-right`)}
+  </div>
+</div>
+
+    );
+  };
+
+  return (
+    <div
+      className="w-screen h-screen bg-black flex flex-col justify-center items-center"
+      style={{
+        overflowY: "scroll",
+      }}
+    >
+      {/* Render root node and its children */}
+      {data
+        .filter((node) => node.parent_id === "NULL")
+        .map((task, index) => renderNode(task, index))}
+    </div>
+  );
+};
+
+export default page;
