@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Trees, LogOut, Plus, Edit2, Trash2 } from 'lucide-react';
-import AddRowModal from '../components/AddRowModal';
-import EditRowModal from '../components/EditRowModal';
-import supabase from '../utils/supabaseClient';
+import AddRowModal from './components/AddRowModal';
+import EditRowModal from './components/EditRowModal';
+import supabase from '../../utils/supabaseClient';
 import Loader from '../components/Loader';  // Your Loader component
 import { useRouter } from 'next/navigation';
 
@@ -19,24 +19,55 @@ function DashboardPage() {
 
   const handleAdd = async (newName) => {
     setIsAddModalOpen(false);
-
-    insertData({ user_id: data[0].user_id, directory_name: newName});
-    setTimeout(fetchData, 1000);
+  
+    const response = await fetch('/api/dashboard/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: data[0].user_id, directory_name: newName })
+    });
+  
+    if (response.ok) {
+      fetchData();  // Refetch data after successful insertion
+    } else {
+      const error = await response.json();
+      console.error('Error adding directory:', error);
+    }
   };
-
-  const handleDelete = (id, e) => {
+  
+  const handleDelete = async (id, e) => {
     e.stopPropagation();
-    deleteData(id);
-
-    setTimeout(fetchData, 1000);
-
+  
+    const response = await fetch('/api/dashboard/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+  
+    if (response.ok) {
+      fetchData();  // Refetch data after successful deletion
+    } else {
+      const error = await response.json();
+      console.error('Error deleting directory:', error);
+    }
   };
-
-  const handleEdit = (id, e) => {
-    e.stopPropagation();
-    setEditId(id);
-    setIsEditModalOpen(true);
+  
+  const handleEdit = async (id, newName) => {
+    // e.stopPropagation();
+    // console.log(id, newName)
+    const response = await fetch('/api/dashboard/edit', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, newName })
+    });
+  
+    if (response.ok) {
+      fetchData();  // Refetch data after successful update
+    } else {
+      const error = await response.json();
+      console.error('Error updating directory:', error);
+    }
   };
+  
 
   const fetchData = async () => {
     const { data, error } = await supabase
@@ -56,63 +87,6 @@ function DashboardPage() {
       // Fetch data from Supabase
       fetchData();
   }, []); 
-
-  
-    const insertData = async (row) => {
-      try{
-        const { data, error } = await supabase
-        .from('directories') // Name of the table
-        .insert(row)//pushed to DB
-
-        if (error) {
-          console.error('Error adding data:', error);
-        } else {
-          console.log('Data added:', data);
-        }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-      }
-    };
-
-
-    // delete data from Supabase
-    const deleteData = async (id) => {
-      try {
-        const { data, error } = await supabase
-          .from('directories') // Name of the table
-          .delete()
-          .match({ directory_id: id }); // Replace 'id' with the column name used for row identification
-  
-        if (error) {
-          console.error('Error deleting data:', error);
-        } else {
-          console.log('Data deleted:', data);
-        }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-      }
-    }
-
-     
-    // edit data in Supabase
-    const editData = async (id, newName) => {
-      try {
-        const { data, error } = await supabase
-          .from('directories') // Name of the table
-          .update({ directory_name: newName })
-          .match({ directory_id: id }); // Replace 'id' with the column name used for row identification
-  
-        if (error) {
-          console.error('Error editing data:', error);
-        } else {
-          console.log('Data edited:', data);
-          setTimeout(fetchData, 1000);
-          setIsEditModalOpen(false);
-        }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-      }
-    }
 
   if (loading) {
     return <Loader />;  // Show the loader until data is fetched
@@ -168,7 +142,11 @@ function DashboardPage() {
                 <span className="font-medium text-gray-900">{row.directory_name}</span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={(e)=>{handleEdit(row.directory_id, e)}}
+                    onClick={(e)=>{
+                      e.stopPropagation();
+                      setEditId(row.directory_id);
+                      setIsEditModalOpen(true);
+                    }}
                     // onClick={() => setIsEditModalOpen(true)}
                     className="text-gray-600 hover:text-emerald-600 transition-colors"
                   >
@@ -194,7 +172,7 @@ function DashboardPage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         id={editId}
-        onEdit={editData}
+        onEdit={handleEdit}
       />
 
       <AddRowModal

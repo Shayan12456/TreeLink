@@ -6,8 +6,8 @@ function EditRowModal({ isOpen, onClose, id, onEdit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(id)
     onEdit(id, name);
+    onClose();
   };
 
   if (!isOpen) return null;

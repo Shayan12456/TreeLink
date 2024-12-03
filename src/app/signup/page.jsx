@@ -1,6 +1,6 @@
 import { Trees } from 'lucide-react';
-import AuthForm from '../components/AuthForm';
-import SocialAuth from '../components/SocialAuth';
+import AuthForm from './components/AuthForm';
+import SocialAuth from '../login/components/SocialAuth';
 
 function SignUpPage() {
   return (
