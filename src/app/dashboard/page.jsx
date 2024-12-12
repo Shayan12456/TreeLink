@@ -36,7 +36,7 @@ function DashboardPage() {
   
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-  
+
     const response = await fetch('/api/dashboard/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -136,7 +136,7 @@ function DashboardPage() {
             {data[0].directories.map((row) => (
               <div
                 key={row.directory_id}
-                onClick={()=>router.push(`taskboard/${data[0].username}/${row.directory_id}`)}
+                onClick={()=>router.push(`taskboard/${data[0].username}/${row.task_id}`)}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <span className="font-medium text-gray-900">{row.directory_name}</span>
@@ -153,7 +153,7 @@ function DashboardPage() {
                     <Edit2 className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={(e) => handleDelete(row.directory_id, e)}
+                    onClick={(e) => handleDelete(row.task_id, e)}
                     className="text-gray-600 hover:text-red-600 transition-colors"
                   >
                     
