@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import Loader from '../../components/Loader';  // Your Loader component
+import Loader from '../components/Loader';  // Your Loader component
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
-import supabase from '../../../utils/supabaseClient';
+import supabase from '../../utils/supabaseClient';
 import AddNodeModal from './components/AddNodeModal';
 import EditNodeModal from './components/EditNodeModal';
 import DeleteNodeModal from './components/DeleteNodeModal';
+import ScreenRotationPrompt from './components/ScreenRotationPrompt';
 import { useParams } from 'next/navigation';
 
 const Page = () => {
@@ -135,6 +136,7 @@ const Page = () => {
   
   return (
     <div className="flex flex-col items-center" key={node.node_id}>
+       <ScreenRotationPrompt />
       {/* Current Node */}
       {
         (node.node_direction)?
