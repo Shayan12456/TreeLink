@@ -103,8 +103,8 @@ function DashboardPage() {
               <span className="ml-2 text-xl font-bold text-gray-800">Treelink</span>
             </div>
             <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
-              <LogOut className="h-5 w-5" />
-              <span>Sign out</span>
+              {/* <LogOut className="h-5 w-5" /> */}
+              {/* <span>Sign out</span> */}
             </button>
           </div>
         </div>
