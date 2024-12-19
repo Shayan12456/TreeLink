@@ -10,7 +10,7 @@ import EditNodeModal from './components/EditNodeModal';
 import DeleteNodeModal from './components/DeleteNodeModal';
 import { useParams } from 'next/navigation';
 
-const page = () => {
+const Page = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -227,7 +227,7 @@ const page = () => {
 
 };
 
-export default page;
+export default Page;
 
 // "use client";
 
