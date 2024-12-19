@@ -189,7 +189,7 @@ const page = () => {
   return (
     <div className="w-screen h-screen bg-black overflow-auto">
     {/* Horizontally scrollable container */}
-    <div className="min-w-[2000vw] flex justify-center overflow-auto">
+    <div className="min-w-[100vw] flex justify-center overflow-auto">
       {/* Start rendering from the root node */}
       <TreeNode nodeId={data.find((node) => node.parent_id === null).node_id }/>
     </div>    
