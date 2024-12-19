@@ -1,4 +1,4 @@
-import supabase from '../../../utils/supabaseClient';
+import supabase from '../../../../utils/supabaseClient';
 
 // Handler function for CRUD operations
 export async function GET(request) {
