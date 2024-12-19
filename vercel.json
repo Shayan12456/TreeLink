@@ -1,5 +1,9 @@
 {
     "rewrites": [
-        {"source": "/(.*)", "destination": "/"}
+      {
+        "source": "/taskboard/:task_id",
+        "destination": "/taskboard/[task_id]"
+      }
     ]
-}
+  }
+  
