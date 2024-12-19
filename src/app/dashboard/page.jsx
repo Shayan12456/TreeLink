@@ -136,7 +136,7 @@ function DashboardPage() {
             {data[0].directories.map((row) => (
               <div
                 key={row.directory_id}
-                onClick={()=>router.push(`taskboard/${row.task_id}`)}
+                onClick={()=>router.push(`${row.task_id}`)}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <span className="font-medium text-gray-900">{row.directory_name}</span>
