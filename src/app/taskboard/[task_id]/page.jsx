@@ -22,7 +22,7 @@ const Page = () => {
 
   // Extract query parameters using useSearchParams
   const searchParams = useParams();
- 
+  // console.log(searchParams)
 
   const handleAdd = async (newName, parent_id, node_direction, task_id) => {
     const defaultTask = {

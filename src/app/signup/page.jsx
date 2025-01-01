@@ -1,8 +1,8 @@
 import { Trees } from 'lucide-react';
 import AuthForm from './components/AuthForm';
-import SocialAuth from '../login/components/SocialAuth';
+import SocialAuth from '../signup/components/SocialAuth';
 
-function SignUpPage() {
+function page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
@@ -35,4 +35,4 @@ function SignUpPage() {
   );
 }
 
-export default SignUpPage;
+export default page;
