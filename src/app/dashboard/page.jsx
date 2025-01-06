@@ -44,13 +44,14 @@
 //       body: JSON.stringify({ id })
 //     });
   
-//     if (response.ok) {
-//       fetchData();  // Refetch data after successful deletion
-//     } else {
-//       const error = await response.json();
-//       console.error('Error deleting directory:', error);
-//     }
-//   };
+    if (response.ok) {
+      // console.log(response.json())
+      fetchData();  // Refetch data after successful deletion
+    } else {
+      const error = await response.json();
+      console.error('Error deleting directory:', error);
+    }
+  };
   
 //   const handleEdit = async (id, newName) => {
 //     // e.stopPropagation();

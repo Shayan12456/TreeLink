@@ -117,7 +117,7 @@ const Page = () => {
 
     };
 
-  useEffect(()=>{fetchData()}, [])
+  useEffect(()=>{fetchData(); window.scrollTo({ left: 2200 })}, [loading])
   //useEffect must not return anything besides a function, which is used for clean-up
     
 
@@ -189,9 +189,9 @@ const Page = () => {
 };
 
   return (
-    <div className="w-screen h-screen bg-black overflow-auto">
+    <div className="w-[400vw] h-screen bg-black overflow-auto">
     {/* Horizontally scrollable container */}
-    <div className="min-w-[100vw] flex justify-center overflow-auto">
+    <div className="flex justify-center items-center">
       {/* Start rendering from the root node */}
       <TreeNode nodeId={data.find((node) => node.parent_id === null).node_id }/>
     </div>    
