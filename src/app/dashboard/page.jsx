@@ -104,10 +104,10 @@ function DashboardPage() {
               <Trees className="h-8 w-8 text-emerald-600" />
               <span className="ml-2 text-xl font-bold text-gray-800">Treelink</span>
             </div>
-            <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            {/* <button className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
               <LogOut className="h-5 w-5" />
               <span>Sign out</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
