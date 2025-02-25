@@ -174,15 +174,15 @@ useEffect(() => {
             {(node.left_child_id && node.right_child_id)?
                 ""
             :
-              <button className='bg-[#079669] text-[white] px-[20px] py-[5px] rounded text-[10px]' onClick={()=>{handleOpenAddModal(node);}}>ADD</button>
+              <button className='bg-[#079669] text-[white] px-[10px] py-[0px] rounded text-[10px]' onClick={()=>{handleOpenAddModal(node);}}>ADD</button>
             }
             {/* Use onClick={() => setIsAddModalOpen(true)} when you need to pass arguments or delay the execution. else it just executes on render when
             Use onClick={setIsAddModalOpen} when you don’t need to pass arguments and just want to call the function directly. */}
             <br />
-            <button className='bg-[yellow] text-[black] px-[20px] py-[5px] rounded text-[10px]' onClick={()=>{handleOpenEditModal(node);}}>EDIT</button>
+            <button className='bg-[yellow] text-[black] px-[10px] py-[0px] rounded text-[10px]' onClick={()=>{handleOpenEditModal(node);}}>EDIT</button>
             <br />
             {(node.parent_id!==null)?  
-              <button className='bg-[red] text-[white] px-[20px] py-[5px] rounded text-[10px]' onClick={()=>{handleOpenDeleteModal(node);}}>DELETE</button>
+              <button className='bg-[red] text-[white] px-[10px] py-[0px] rounded text-[10px]' onClick={()=>{handleOpenDeleteModal(node);}}>DELETE</button>
             :""}
           </div>
       </div>
